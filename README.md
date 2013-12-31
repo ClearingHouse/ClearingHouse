@@ -1,7 +1,4 @@
-# Counterparty
-
-The official Counterparty protocol specification
-
+# The Counterparty Protocol
 
 ## Summary
 
