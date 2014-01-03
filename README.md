@@ -230,8 +230,8 @@ thus:
 
 	XCP_EARNED = BTC_BURNED * (1000 * (1 + .5 * ((END_BLOCK - CURRENT_BLOCK) / (END_BLOCK - START_BLOCK))
 
-`END_BLOCK` is the block after which the burn period is over and
-`START_BLOCK` is the block with which the burn period begins. The earlier the
+`END_BLOCK` is the block after which the burn period is over (**block #283810**) and
+`START_BLOCK` is the block with which the burn period begins (**block #278310**). The earlier the
 burn, the better the price, which may be between 1000 and 1500 XCP/BTC.
 
 Burn messages have precisely the string ‘ProofOfBurn’ stored in the
