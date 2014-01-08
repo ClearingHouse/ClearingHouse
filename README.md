@@ -65,6 +65,7 @@ everything except for the expiration of orders and bets.
 * Bet
 * Dividend
 * Burn
+* Cancel
 
 
 ### Send
@@ -107,9 +108,6 @@ by the latter existing order. After all possible order matches are made, the
 current (buy) order is listed as an open order itself. If there exist multiple
 open orders at the same price, then order that was placed earlier is matched
 first.
-
-Open orders cannot be changed. To cancel an open order of your own, simply
-[attempt to] fill it yourself.
 
 Open orders expire after they have been open for a user‐specified number of
 blocks. Order Matches waiting for Bitcoin payments expire as soon as one of the
@@ -209,8 +207,7 @@ Bets expire the same way that orders do, i.e. after a particular number of
 blocks. Bet Matches expire 2016 blocks after a block is seen with a block timestamp
 after its deadline.
 
-Open bets cannot be changed. To cancel an open bet of your own, simply [attempt
-to] fill it yourself.
+Betting fees are proportional to the initial wagers, not the earnings.
 
 
 ### Dividend
@@ -236,3 +233,8 @@ burn, the better the price, which may be between 1000 and 1500 XCP/BTC.
 
 Burn messages have precisely the string ‘ProofOfBurn’ stored in the
 `OP_RETURN` output.
+
+### Cancel
+
+* TODO
+* Can’t cancel order matches awaiting BTC payment (if buying BTC, not fair; if selling, not necessary)
