@@ -122,6 +122,8 @@ XCP and the unit (not satoshis) of the callable asset.
 
 * max expiration times
 
+* at beginning of block (before txes are parsed)
+
 
 
 ## Message Types
@@ -167,11 +169,12 @@ addresses their new balances.
 
 All orders are *limit orders*: an asking price is specified in the ratio of how
 much of one would like to get and give; an order is matched to the open order
-with the worst price below the limit, and the order match is made at *that*
+with the best price below the limit, and the order match is made at *that*
 price. That is, if there is one open order to sell at .11 XCP/ASST, another
 at .12 XCP/ASST, and another at .145 XCP/BTC, then a new order to buy at .14
-XCP/ASST will be matched to the second sell order, and the XCP and BTC will be
-traded at a price of .12 XCP/ASST.
+XCP/ASST will be matched to the first sell order first, and the XCP and BTC
+will be traded at a price of .11 XCP/ASST, and then if any are left, they’ll be
+sold at .12 XCP/ASST.
 
 All orders allow for partial execution; there are no all‐or‐none orders. If, in
 the previous example, the party buying the bitcoins wanted to buy more than the
@@ -276,7 +279,8 @@ Bets expire the same way that orders do, i.e. after a particular number of
 blocks. Bet Matches expire 2016 blocks after a block is seen with a block
 timestamp after its deadline.
 
-Betting fees are proportional to the initial wagers, not the earnings.
+Betting fees are proportional to the initial wagers, not the earnings. They are
+taken from, not added to, the quantities wagered.
 
 * Because of the block time, and the non‐deterministic way in which
   transactions are ordered in the blockchain, all contracts must be not be
