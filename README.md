@@ -3,11 +3,11 @@
 ## Summary
 
 Counterparty is a suite of financial tools in a protocol built on top of the
-Bitcoin blockchain and using the blockchain as a service for the trusted
-timestamping and proof‐of‐publication of its messages.
+Bitcoin blockchain and using the blockchain as a service for the reliable
+publication and timestamping of its messages.
 
 The reference implementation is `counterpartyd`, which is hosted at
-<https://github.com/PhantomPhreak/counterpartyd>.
+<https://github.com/CounterpartyXCP/counterpartyd>.
 
 
 ## Transactions
@@ -17,10 +17,9 @@ Every Counterparty message has the following identifying features:
 * One destination address
 * A quantity of bitcoins sent from the source to the destination, if it exists.
 * A fee, in bitcoins, paid to the bitcoin miners who include the transaction in
-a block.
-* Up to 80 bytes of ‘data’, imbedded in the Bitcoin transaction’s one alloted
-  `OP_RETURN` output or across multiple multi‐signature outputs (or a mix of
-the two).
+  a block.
+* Up to 80 bytes of ‘data’, imbedded in specially constructed transaction
+  outputs.
 
 Every Bitcoin transaction carrying a Counterparty transaction has the following
 possible outputs: a single destination output, zero or more data outputs, and
@@ -28,23 +27,26 @@ optional change outputs. The first output before the first data output is the
 destination output. Change outputs (outputs after the last data output) have no
 importance to Counterparty. All data outputs must appear in direct succession.
 
-Multi‐signature data outputs are one‐of‐two outputs where the first public
-key is that of the sender, so that the value of the output is redeemable, and
-the second public key encodes the data, zero‐padded and prefixed with a length
-byte.
-
 For identification purposes, every Counterparty transaction’s ‘data’ field is
 prefixed by the string ‘CNTRPRTY’, encoded in UTF‐8. This string is long enough
-that transactions with pseudo‐random data stored in the `OP_RETURN` field
-will be extremely unlikely to be mistaken for Counterparty transactions. In
-testing (i.e. using the TESTCOIN Counterparty network on any blockchain),
-this string is ‘XX’.
+that transactions with outputs containing pseudo‐random data cannot be mistaken
+for containing valid Counterparty transaction data. In testing (i.e. using the
+TESTCOIN Counterparty network on any blockchain), this string is ‘XX’.
+
+Counterparty data may be stored in three different types of outputs, or in some
+mixtures of those formats. Multi‐signature data outputs are one‐of‐two outputs
+where the first public key is that of the sender, so that the value of the
+output is redeemable, and the second public key encodes the data, zero‐padded
+and prefixed with a length byte.
+	`OP_RETURN` data output format
+	pay‐to‐pubkeyhash data output format
+		encryption
 
 The existence of the destination output, and the significance of the size of
-the Bitcoin fee and the Bitcoins transacted, depend on the Counterparty
-message type, which is determined by the four bytes in the data field that
-immediately follow the identification prefix. The rest of the data have a
-formatting specific to the message type, described in the source code.
+the Bitcoin fee and the Bitcoins transacted, depend on the Counterparty message
+type, which is determined by the four bytes in the data field that immediately
+follow the identification prefix. The rest of the data have a formatting
+specific to the message type, described in the source code.
 
 Every Counterparty transaction must, moreover, have a unique and unambiguous
 source address: all of the inputs to a Bitcoin transaction which contains a
@@ -84,7 +86,7 @@ All assets except BTC and XCP have the following properties:
 * Divisiblity
 * Callability
 * Call date (if callable)
-* Call price (if callable)
+* Call price (if callable) (non‐negative)
 
 
 Asset names are strings of uppercase ASCII characters that, when encoded as a
@@ -124,6 +126,16 @@ XCP and the unit (not satoshis) of the callable asset.
 
 * at beginning of block (before txes are parsed)
 
+
+## Transaction Statuses
+
+*Offers* (i.e. orders and bets) are given a status `filled` when their
+`give_remaining`, `get_remaining`, `wager_remaining`, `counterwager_remaining`,
+`fee_provided_remaining` or `fee_required_remaining` are no longer positive
+quantities.
+
+Because order matches pending BTC payment may be expired, orders involving
+Bitcoin cannot be filled, but remain always with a status `open`.
 
 
 ## Message Types
@@ -174,7 +186,8 @@ price. That is, if there is one open order to sell at .11 XCP/ASST, another
 at .12 XCP/ASST, and another at .145 XCP/BTC, then a new order to buy at .14
 XCP/ASST will be matched to the first sell order first, and the XCP and BTC
 will be traded at a price of .11 XCP/ASST, and then if any are left, they’ll be
-sold at .12 XCP/ASST.
+sold at .12 XCP/ASST. If two existing orders have the same price, then the one
+made earlier will match first.
 
 All orders allow for partial execution; there are no all‐or‐none orders. If, in
 the previous example, the party buying the bitcoins wanted to buy more than the
@@ -196,7 +209,15 @@ each party is offering are stored in escrow. However, it is impossible to
 escrow bitcoins, so those attempting to buy bitcoins may ask that only orders
 which pay a fee in bitcoins to Bitcoin miners be matched to their own. On the
 other hand, when creating an order to sell bitcoins, a user may pay whatever
-fee he likes. Partial orders pay partial fees.
+fee he likes. Partial orders pay partial fees. These fees are designated in the
+code as `fee_required` and `fee_provided`, and as orders involving BTC are
+matched (expired), these fees (required and provided) are debited
+(sometimes replenished), in proportion to the fraction of the order that is
+matched. That is, if an order to sell 1 BTC has a `fee_provided` of 0.01 BTC (a
+1%), and that order matches for 0.5 BTC initially, then the
+`fee_provided_remaining` for that order will thenceforth be 0.005 BTC.
+*Provided* fees, however, are not replenished upon failure to make BTC
+payments, or their anti‐trolling effect would be voided.
 
 Payments of bitcoins to close order matches waiting for bitcoins are done with
 the a **BTCpay** message, which stores in its data field only the string
@@ -219,6 +240,10 @@ Assets may be locked irreversibly against the issuance of further quantities
 and guaranteeing its holders against its inflation. To lock an asset, set the
 description to ‘LOCK’ (case‐insensitive).
 
+Issuances of any non‐zero quantity, that is, issuances which do not merely
+change, e.g., the description of the asset, involve a debit (and destruction)
+of now 0.5 XCP.
+
 
 ### Broadcast
 
@@ -240,9 +265,11 @@ of any further broadcasts and from being the subject of any new bets. (If a
 feed is locked while there are open bets or unsettled bet matches that refer to
 it, then those bets and bet matches will expire harmlessly.)
 
-Broadcasts with a value of -1 are ignored for the purpose of bet settlement.
-
 A feed is identified by the address which publishes it.
+
+Broadcasts with a value of -2 cancel all open bets on the feed.
+Broadcasts with a value of -3 cancel all pending bet matches on the feed. (This is equivalent to waiting for two weeks after the deadlines.)
+Broadcasts with any other negative value are ignored for the purpose of bet settlement, but they still update the last broadcast time.
 
 
 ### Bet
@@ -320,10 +347,14 @@ Burn messages have precisely the string ‘ProofOfBurn’ stored in the
 
 ### Cancel
 
-* TODO
-* Can’t cancel order matches awaiting BTC payment (if buying BTC, not fair; if selling, not necessary)
+Open offers may be cancelled, which cancellation is irrevokable.
+
+A *cancel* message contains only the hash of the Bitcoin transaction that
+contains the order or bet to be cancelled. Only the address which made an offer
+may cancel it.
 
 
 ### Callback
 
-* TODO
+*Callbacks are currently disabled on Counterparty mainnet, as the logic by
+which they are parsed is currently undergoing revision and testing.*
