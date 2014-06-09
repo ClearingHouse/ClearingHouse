@@ -315,15 +315,19 @@ taken from, not added to, the quantities wagered.
   escrow, and there must be a settlement date. Otherwise, one could see a price
   drop coming, and ‘fight’ to hide the funds that were going to be deducted.
 
-* feed fees
+Feed fees are deducted from the final settlement amount.
 
 
 ### Dividend
 
-A dividend payment is a payment of some quantity of XCP to every holder of a
-given asset in proportion to the size of their holdings. Dividend‐yielding
-assets may be either divisible or indivisible. A dividend payment to any asset
-may originate from any address.
+A dividend payment is a payment of some quantity of any Counterparty asset
+(including BTC) to every holder of a an asset (except BTC or XCP) in proportion
+to the size of their holdings. Dividend‐yielding assets may be either divisible
+or indivisible. A dividend payment to any asset may originate from any address.
+The asset for dividend payments and the assets whose holders receive the
+payments may be the same. Bitcoin dividend payments do not employ the
+Counterparty protocol and so are larger and more expensive (in fees) than all
+other dividend payments.
 
 
 ### Burn
