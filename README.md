@@ -61,6 +61,7 @@ All messages are parsed in order, one at a time, ignoring block boundaries.
 
 Orders, bets, order matches and bet matches are expired at the end of blocks.
 
+* Currently only Pay‐to‐Pubkey‐Hash addresses are supported.
 
 
 ## Non‐Counterparty transactions
@@ -75,6 +76,14 @@ Neither of these two transactions is constructed with a data field, and in the
 latter, multiple ‘destination’ outputs are used.
 
 
+## mempool transactions
+
+Always have block index = 9999999 (`config.MEMPOOL_BLOCK_INDEX`).
+
+DB changes never persist across sessions.
+
+No matching for orders or bets.
+
 
 ## Assets
 
@@ -86,7 +95,9 @@ All assets except BTC and XCP have the following properties:
 * Divisiblity
 * Callability
 * Call date (if callable)
+	* may be delayed with later issuances
 * Call price (if callable) (non‐negative)
+	* may be increased with later issuances
 
 
 Asset names are strings of uppercase ASCII characters that, when encoded as a
@@ -201,8 +212,8 @@ Open orders expire after they have been open for a user‐specified number of
 blocks. When an order expires, all escrowed funds are returned to the parties
 that originally had them.
 
-Order Matches waiting for Bitcoin payments expire after ten blocks; the
-constituent orders are replenished.
+Order Matches waiting for Bitcoin payments expire after twenty blocks
+(originally otherwise); the constituent orders are replenished.
 
 In general, there can be no such thing as a fake order, because the assets that
 each party is offering are stored in escrow. However, it is impossible to
@@ -268,7 +279,7 @@ it, then those bets and bet matches will expire harmlessly.)
 A feed is identified by the address which publishes it.
 
 Broadcasts with a value of -2 cancel all open bets on the feed.
-Broadcasts with a value of -3 cancel all pending bet matches on the feed. (This is equivalent to waiting for two weeks after the deadlines.)
+Broadcasts with a value of -3 cancel all pending bet matches on the feed. (This is equivalent to waiting for two weeks after the deadline.)
 Broadcasts with any other negative value are ignored for the purpose of bet settlement, but they still update the last broadcast time.
 
 
@@ -348,10 +359,12 @@ Burn messages have precisely the string ‘ProofOfBurn’ stored in the
 
 * new data‐less burn
 
+* burn period is over
+
 
 ### Cancel
 
-Open offers may be cancelled, which cancellation is irrevokable.
+Open offers may be cancelled, which cancellation is irrevocable.
 
 A *cancel* message contains only the hash of the Bitcoin transaction that
 contains the order or bet to be cancelled. Only the address which made an offer
