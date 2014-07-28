@@ -1,39 +1,39 @@
-# The Counterparty Protocol
+# The ClearingHouse Protocol
 
 ## Summary
 
-Counterparty is a suite of financial tools in a protocol built on top of the
-Bitcoin blockchain and using the blockchain as a service for the reliable
+ClearingHouse is a suite of financial tools in a protocol built on top of the
+Viacoin blockchain and using the blockchain as a service for the reliable
 publication and timestamping of its messages.
 
-The reference implementation is `counterpartyd`, which is hosted at
-<https://github.com/CounterpartyXCP/counterpartyd>.
+The reference implementation is `ClearingHoused`, which is hosted at
+<https://github.com/clearinghouse/ClearingHoused>.
 
 
 ## Transactions
 
-Every Counterparty message has the following identifying features:
+Every ClearingHouse message has the following identifying features:
 * One source address
 * One destination address
-* A quantity of bitcoins sent from the source to the destination, if it exists.
-* A fee, in bitcoins, paid to the bitcoin miners who include the transaction in
+* A quantity of Viacoins sent from the source to the destination, if it exists.
+* A fee, in Viacoins, paid to the Viacoin miners who include the transaction in
   a block.
-* Up to 80 bytes of ‘data’, imbedded in specially constructed transaction
+* Up to 80 bytes of ‘data’, embedded in specially constructed transaction
   outputs.
 
-Every Bitcoin transaction carrying a Counterparty transaction has the following
+Every Viacoin transaction carrying a ClearingHouse transaction has the following
 possible outputs: a single destination output, zero or more data outputs, and
 optional change outputs. The first output before the first data output is the
 destination output. Change outputs (outputs after the last data output) have no
-importance to Counterparty. All data outputs must appear in direct succession.
+importance to ClearingHouse. All data outputs must appear in direct succession.
 
-For identification purposes, every Counterparty transaction’s ‘data’ field is
-prefixed by the string ‘CNTRPRTY’, encoded in UTF‐8. This string is long enough
+For identification purposes, every ClearingHouse transaction’s ‘data’ field is
+prefixed by the string ‘CLRNGHSX’, encoded in UTF‐8. This string is long enough
 that transactions with outputs containing pseudo‐random data cannot be mistaken
-for containing valid Counterparty transaction data. In testing (i.e. using the
-TESTCOIN Counterparty network on any blockchain), this string is ‘XX’.
+for containing valid ClearingHouse transaction data. In testing (i.e. using the
+TESTCOIN ClearingHouse network on any blockchain), this string is ‘XX’.
 
-Counterparty data may be stored in three different types of outputs, or in some
+ClearingHouse data may be stored in three different types of outputs, or in some
 mixtures of those formats. Multi‐signature data outputs are one‐of‐two outputs
 where the first public key is that of the sender, so that the value of the
 output is redeemable, and the second public key encodes the data, zero‐padded
@@ -43,18 +43,18 @@ and prefixed with a length byte.
 		encryption
 
 The existence of the destination output, and the significance of the size of
-the Bitcoin fee and the Bitcoins transacted, depend on the Counterparty message
+the Viacoin fee and the Viacoins transacted, depend on the ClearingHouse message
 type, which is determined by the four bytes in the data field that immediately
 follow the identification prefix. The rest of the data have a formatting
 specific to the message type, described in the source code.
 
-Every Counterparty transaction must, moreover, have a unique and unambiguous
-source address: all of the inputs to a Bitcoin transaction which contains a
-Counterparty transaction must be the same—the unique source of the funds in the
-Bitcoin transaction is the source of the Counterparty transaction within.
+Every ClearingHouse transaction must, moreover, have a unique and unambiguous
+source address: all of the inputs to a Viacoin transaction which contains a
+ClearingHouse transaction must be the same—the unique source of the funds in the
+Viacoin transaction is the source of the ClearingHouse transaction within.
 
-The source and destination of a Counterparty transaction are Bitcoin addresses,
-and any Bitcoin address may receive any Counterparty asset (and send it, if it
+The source and destination of a ClearingHouse transaction are Viacoin addresses,
+and any Viacoin address may receive any ClearingHouse asset (and send it, if it
 owns any).
 
 All messages are parsed in order, one at a time, ignoring block boundaries.
@@ -64,13 +64,13 @@ Orders, bets, order matches and bet matches are expired at the end of blocks.
 * Currently only Pay‐to‐Pubkey‐Hash addresses are supported.
 
 
-## Non‐Counterparty transactions
+## Non‐ClearingHouse transactions
 
-counterpartyd supports the construction of two kinds of transactions that are
-not themselves considered Counterparty transactions:
+ClearingHoused supports the construction of two kinds of transactions that are
+not themselves considered ClearingHouse transactions:
 
-* BTC sends
-* BTC dividends to Counterparty assets
+* VIA sends
+* VIA dividends to ClearingHouse assets
 
 Neither of these two transactions is constructed with a data field, and in the
 latter, multiple ‘destination’ outputs are used.
@@ -87,7 +87,7 @@ No matching for orders or bets.
 
 ## Assets
 
-All assets except BTC and XCP have the following properties:
+All assets except VIA and XCH have the following properties:
 
 * Asset name
 * Asset ID
@@ -102,7 +102,7 @@ All assets except BTC and XCP have the following properties:
 
 Asset names are strings of uppercase ASCII characters that, when encoded as a
 decimal integer, are greater than 26^3 and less than or equal to 256^8: all
-asset names, other than ‘BTC’ and ‘XCP’ must be at least four letters long;
+asset names, other than ‘VIA’ and ‘XCH’ must be at least four letters long;
 asset names may not begin with the character ‘A’. Thus, some thirteen‐character
 asset names are valid, but no fourteen‐character names are.
 
@@ -111,14 +111,14 @@ divisible to eight decimal places. Assets also come with descriptions, which
 may be changed at any time.
 
 Assets may be ‘callable’: callable assets may be forcibly ‘called back’ by
-their present issuer, after their *call date*, for their *call price* (in XCP),
+their present issuer, after their *call date*, for their *call price* (in XCH),
 these values being set at the time of the asset’s first issuance.
 
 Callable assets may be called back after their call date has been first passed
 by a block in the blockchain.
 
 Call prices are specified to six decimal place of precision, and are a ratio of
-XCP and the unit (not satoshis) of the callable asset.
+XCH and the unit (not satoshis) of the callable asset.
 
 
 
@@ -127,7 +127,7 @@ XCP and the unit (not satoshis) of the callable asset.
 * max int
 
 * oversend, overbet, overorder
-	* not btcpay, callback (impossible, because of rounding), issuance (fragile!), dividend (?!)
+        * not VIApay, callback (impossible, because of rounding), issuance (fragile!), dividend (?!)
 
 
 
@@ -145,15 +145,15 @@ XCP and the unit (not satoshis) of the callable asset.
 `fee_provided_remaining` or `fee_required_remaining` are no longer positive
 quantities.
 
-Because order matches pending BTC payment may be expired, orders involving
-Bitcoin cannot be filled, but remain always with a status `open`.
+Because order matches pending VIA payment may be expired, orders involving
+Viacoin cannot be filled, but remain always with a status `open`.
 
 
 ## Message Types
 
 * Send
 * Order
-* BTCPay
+* VIAPay
 * Issue
 * Broadcast
 * Bet
@@ -165,12 +165,12 @@ Bitcoin cannot be filled, but remain always with a status `open`.
 
 ### Send
 
-A **send** message sends a quantity of any Counterparty asset from the source
+A **send** message sends a quantity of any ClearingHouse asset from the source
 address to the destination address. If the sender does not hold a sufficient
 quantity of that asset at the time that the send message is parsed (in the
 sequence of transactions), then the send is filled partially.
 
-counterpartyd supports sending bitcoins, for which no data output is used.
+ClearingHoused supports sending Viacoins, for which no data output is used.
 
 
 ### Order
@@ -179,29 +179,29 @@ An ‘order’ is an offer to *give* a particular quantity of a particular asset
 and *get* some quantity of some other asset in return. No distinction is drawn
 between a ‘buy order’ and a ‘sell order’. The assets being given are escrowed
 away immediately upon the order being parsed. That is, if someone wants to give
-1 XCP for 2 BTC, then as soon as he publishes that order, his balance of XCP is
+1 XCH for 2 VIA, then as soon as he publishes that order, his balance of XCH is
 reduced by one.
 
 When an order is seen in the blockchain, the protocol attempts to match it,
 deterministically, with another open order previously seen. Two matched orders
 are called a ‘order match’. If either of a order match’s constituent orders
-involve Bitcoin, then the order match is assigned the status ‘pending’ until
-the necessary BTCPay transaction is published. Otherwise, the trade is
+involve Viacoin, then the order match is assigned the status ‘pending’ until
+the necessary VIAPay transaction is published. Otherwise, the trade is
 completed immediately, with the protocol itself assigning the participating
 addresses their new balances.
 
 All orders are *limit orders*: an asking price is specified in the ratio of how
 much of one would like to get and give; an order is matched to the open order
 with the best price below the limit, and the order match is made at *that*
-price. That is, if there is one open order to sell at .11 XCP/ASST, another
-at .12 XCP/ASST, and another at .145 XCP/BTC, then a new order to buy at .14
-XCP/ASST will be matched to the first sell order first, and the XCP and BTC
-will be traded at a price of .11 XCP/ASST, and then if any are left, they’ll be
-sold at .12 XCP/ASST. If two existing orders have the same price, then the one
+price. That is, if there is one open order to sell at .11 XCH/ASST, another
+at .12 XCH/ASST, and another at .145 XCH/VIA, then a new order to buy at .14
+XCH/ASST will be matched to the first sell order first, and the XCH and VIA
+will be traded at a price of .11 XCH/ASST, and then if any are left, they’ll be
+sold at .12 XCH/ASST. If two existing orders have the same price, then the one
 made earlier will match first.
 
 All orders allow for partial execution; there are no all‐or‐none orders. If, in
-the previous example, the party buying the bitcoins wanted to buy more than the
+the previous example, the party buying the Viacoins wanted to buy more than the
 first sell offer had available, then the rest of the buy order would be filled
 by the latter existing order. After all possible order matches are made, the
 current (buy) order is listed as an open order itself. If there exist multiple
@@ -212,26 +212,26 @@ Open orders expire after they have been open for a user‐specified number of
 blocks. When an order expires, all escrowed funds are returned to the parties
 that originally had them.
 
-Order Matches waiting for Bitcoin payments expire after twenty blocks
+Order Matches waiting for Viacoin payments expire after twenty blocks
 (originally otherwise); the constituent orders are replenished.
 
 In general, there can be no such thing as a fake order, because the assets that
 each party is offering are stored in escrow. However, it is impossible to
-escrow bitcoins, so those attempting to buy bitcoins may ask that only orders
-which pay a fee in bitcoins to Bitcoin miners be matched to their own. On the
-other hand, when creating an order to sell bitcoins, a user may pay whatever
+escrow Viacoins, so those attempting to buy Viacoins may ask that only orders
+which pay a fee in Viacoins to Viacoin miners be matched to their own. On the
+other hand, when creating an order to sell Viacoins, a user may pay whatever
 fee he likes. Partial orders pay partial fees. These fees are designated in the
-code as `fee_required` and `fee_provided`, and as orders involving BTC are
+code as `fee_required` and `fee_provided`, and as orders involving VIA are
 matched (expired), these fees (required and provided) are debited
 (sometimes replenished), in proportion to the fraction of the order that is
-matched. That is, if an order to sell 1 BTC has a `fee_provided` of 0.01 BTC (a
-1%), and that order matches for 0.5 BTC initially, then the
-`fee_provided_remaining` for that order will thenceforth be 0.005 BTC.
-*Provided* fees, however, are not replenished upon failure to make BTC
+matched. That is, if an order to sell 1 VIA has a `fee_provided` of 0.01 VIA (a
+1%), and that order matches for 0.5 VIA initially, then the
+`fee_provided_remaining` for that order will thenceforth be 0.005 VIA.
+*Provided* fees, however, are not replenished upon failure to make VIA
 payments, or their anti‐trolling effect would be voided.
 
-Payments of bitcoins to close order matches waiting for bitcoins are done with
-the a **BTCpay** message, which stores in its data field only the string
+Payments of Viacoins to close order matches waiting for Viacoins are done with
+the a **VIApay** message, which stores in its data field only the string
 concatenation of the transaction hashes which compose the Order Match which it
 fulfils.
 
@@ -242,7 +242,7 @@ Assets are issued with the **issuance** message type: the user picks a name and
 a quantity, and the protocol credits his address accordingly. The asset name
 must either be unique or be one previously issued by the same address. When
 re‐issuing an asset, that is, issuing more of an already‐issued asset, the
-divisibilities and the issuing address must match.
+divisibility and the issuing address must match.
 
 The rights to issue assets under a given name may be transferred to any other
 address. 
@@ -253,7 +253,7 @@ description to ‘LOCK’ (case‐insensitive).
 
 Issuances of any non‐zero quantity, that is, issuances which do not merely
 change, e.g., the description of the asset, involve a debit (and destruction)
-of now 0.5 XCP.
+of now 0.5 XCH.
 
 
 ### Broadcast
@@ -331,28 +331,28 @@ Feed fees are deducted from the final settlement amount.
 
 ### Dividend
 
-A dividend payment is a payment of some quantity of any Counterparty asset
-(including BTC) to every holder of a an asset (except BTC or XCP) in proportion
+A dividend payment is a payment of some quantity of any ClearingHouse asset
+(including VIA) to every holder of a an asset (except VIA or XCH) in proportion
 to the size of their holdings. Dividend‐yielding assets may be either divisible
 or indivisible. A dividend payment to any asset may originate from any address.
 The asset for dividend payments and the assets whose holders receive the
-payments may be the same. Bitcoin dividend payments do not employ the
-Counterparty protocol and so are larger and more expensive (in fees) than all
+payments may be the same. Viacoin dividend payments do not employ the
+ClearingHouse protocol and so are larger and more expensive (in fees) than all
 other dividend payments.
 
 
 ### Burn
 
-Balances in Counterparty’s native currency, ‘XCP’, will be initialised by
-‘burning’ bitcoins in miners’ fees during a particular period of time using the
-a **burn** message type. The number of XCP earned per bitcoin is calculated
+Balances in ClearingHouse’s native currency, ‘XCH’, will be initialised by
+‘burning’ Viacoins in miners’ fees during a particular period of time using the
+a **burn** message type. The number of XCH earned per Viacoin is calculated
 thus: 
 
-	XCP_EARNED = BTC_BURNED * (1000 * (1 + .5 * ((END_BLOCK - CURRENT_BLOCK) / (END_BLOCK - START_BLOCK))
+        XCH_EARNED = VIA_BURNED * (1000 * (1 + .5 * ((END_BLOCK - CURRENT_BLOCK) / (END_BLOCK - START_BLOCK))
 
 `END_BLOCK` is the block after which the burn period is over (**block #283810**) and
 `START_BLOCK` is the block with which the burn period begins (**block #278310**). The earlier the
-burn, the better the price, which may be between 1000 and 1500 XCP/BTC.
+burn, the better the price, which may be between 1000 and 1500 XCH/VIA.
 
 Burn messages have precisely the string ‘ProofOfBurn’ stored in the
 `OP_RETURN` output.
@@ -366,12 +366,12 @@ Burn messages have precisely the string ‘ProofOfBurn’ stored in the
 
 Open offers may be cancelled, which cancellation is irrevocable.
 
-A *cancel* message contains only the hash of the Bitcoin transaction that
+A *cancel* message contains only the hash of the Viacoin transaction that
 contains the order or bet to be cancelled. Only the address which made an offer
 may cancel it.
 
 
 ### Callback
 
-*Callbacks are currently disabled on Counterparty mainnet, as the logic by
+*Callbacks are currently disabled on ClearingHouse mainnet, as the logic by
 which they are parsed is currently undergoing revision and testing.*
