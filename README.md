@@ -6,8 +6,8 @@ ClearingHouse is a suite of financial tools in a protocol built on top of the
 Viacoin blockchain and using the blockchain as a service for the reliable
 publication and timestamping of its messages.
 
-The reference implementation is `ClearingHoused`, which is hosted at
-<https://github.com/clearinghouse/ClearingHoused>.
+The reference implementation is `clearinghoused`, which is hosted at
+<https://github.com/ClearingHouse/clearinghoused>.
 
 
 ## Transactions
@@ -344,7 +344,7 @@ other dividend payments.
 ### Burn
 
 Balances in ClearingHouse’s native currency, ‘XCH’, will be initialised by
-‘burning’ Viacoins in miners’ fees during a particular period of time using the
+‘burning’ Viacoins during a particular period of time using the
 a **burn** message type. The number of XCH earned per Viacoin is calculated
 thus: 
 
