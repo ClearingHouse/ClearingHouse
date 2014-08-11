@@ -28,7 +28,7 @@ destination output. Change outputs (outputs after the last data output) have no
 importance to ClearingHouse. All data outputs must appear in direct succession.
 
 For identification purposes, every ClearingHouse transaction’s ‘data’ field is
-prefixed by the string ‘CLRNGHSX’, encoded in UTF‐8. This string is long enough
+prefixed by the string ‘XCLRNGHS’, encoded in UTF‐8. This string is long enough
 that transactions with outputs containing pseudo‐random data cannot be mistaken
 for containing valid ClearingHouse transaction data. In testing (i.e. using the
 TESTCOIN ClearingHouse network on any blockchain), this string is ‘XX’.
@@ -344,22 +344,15 @@ other dividend payments.
 ### Burn
 
 Balances in ClearingHouse’s native currency, ‘XCH’, will be initialised by
-‘burning’ Viacoins during a particular period of time using the
+‘burning’ Viacoins during a the 'fire sale' period of time using the
 a **burn** message type. The number of XCH earned per Viacoin is calculated
 thus: 
 
-        XCH_EARNED = VIA_BURNED * (1000 * (1 + .5 * ((END_BLOCK - CURRENT_BLOCK) / (END_BLOCK - START_BLOCK))
+        XCH_EARNED = VIA_BURNED * (85 + (15 * Fraction(partial_time, total_time)))
 
-`END_BLOCK` is the block after which the burn period is over (**block #283810**) and
-`START_BLOCK` is the block with which the burn period begins (**block #278310**). The earlier the
-burn, the better the price, which may be between 1000 and 1500 XCH/VIA.
-
-Burn messages have precisely the string ‘ProofOfBurn’ stored in the
-`OP_RETURN` output.
-
-* new data‐less burn
-
-* burn period is over
+`END_BLOCK` is the block after which the burn period is over (**block #250525**) and
+`START_BLOCK` is the block with which the burn period begins (**block #88525**). The earlier the
+burn, the better the price, which may be between 100 and 85 XCH/VIA.
 
 
 ### Cancel
