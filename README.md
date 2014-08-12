@@ -350,8 +350,8 @@ thus:
 
         XCH_EARNED = VIA_BURNED * (85 + (15 * Fraction(partial_time, total_time)))
 
-`END_BLOCK` is the block after which the burn period is over (**block #250525**) and
-`START_BLOCK` is the block with which the burn period begins (**block #88525**). The earlier the
+`END_BLOCK` is the block after which the burn period is over (**block #251100**) and
+`START_BLOCK` is the block with which the burn period begins (**block #89100**). The earlier the
 burn, the better the price, which may be between 100 and 85 XCH/VIA.
 
 
