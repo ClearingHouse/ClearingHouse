@@ -253,7 +253,7 @@ description to ‘LOCK’ (case‐insensitive).
 
 Issuances of any non‐zero quantity, that is, issuances which do not merely
 change, e.g., the description of the asset, involve a debit (and destruction)
-of now 1 XCH.
+of now 100 XCH.
 
 
 ### Broadcast
